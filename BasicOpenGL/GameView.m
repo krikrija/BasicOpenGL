@@ -183,6 +183,9 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
     // NOTE(KS): Unlike with the VBO, we should NOT unbind the EBO within the VAO block.
     // Not exactly sure why. But we can unbind it here without any issues.
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    // Uncommenting this call will result in wireframe polygons.
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 }
 
 static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp *now,
@@ -201,8 +204,8 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     // We must lock GL context because the display link is threaded.
     CGLLockContext((CGLContextObj)self.openGLContext.CGLContextObj);
     {
-//        double frameRate = outputTime->rateScalar * (double)outputTime->videoTimeScale / (double)outputTime->videoRefreshPeriod;
-//        NSTimeInterval deltaTime = 1.0 / frameRate;
+        // double frameRate = outputTime->rateScalar * (double)outputTime->videoTimeScale / (double)outputTime->videoRefreshPeriod;
+        // NSTimeInterval deltaTime = 1.0 / frameRate;
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
