@@ -21,9 +21,15 @@ NSOpenGLPixelFormatAttribute attrs[] =
 };
 
 GLfloat vertices[] = {
-    -0.5f, -0.5f, 0.0f,
-     0.5f, -0.5f, 0.0f,
-     0.0f,  0.5f, 0.0f
+     0.5f,  0.5f, 0.0f, // Top Right
+     0.5f, -0.5f, 0.0f, // Bottom Right
+    -0.5f, -0.5f, 0.0f, // Bottom Left
+    -0.5f,  0.5f, 0.0f  // Top Left
+};
+
+GLuint indices[] = {
+    0, 1, 3,   // First Triangle
+    1, 2, 3    // Second Triangle
 };
 
 // Shaders
@@ -44,6 +50,7 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
 @interface GameView ()
 
 @property (assign) GLuint vbo;
+@property (assign) GLuint ebo;
 @property (assign) GLuint vao;
 @property (assign) GLuint shaderProgram;
 @property (assign) CVDisplayLinkRef displayLink; // Manages the rendering thread
@@ -145,6 +152,10 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
     glGenBuffers(1, &_vbo);
     NSLog(@"VBO location: %u", self.vbo);
 
+    // Generate an element buffer object to store our vertex indices for optimized drawing.
+    glGenBuffers(1, &_ebo);
+    NSLog(@"EBO location: %u", self.ebo);
+
     // NOTE(KS): All commands performed within the following block are stored within the
     // vertex array object.
     glBindVertexArray(self.vao);
@@ -158,6 +169,8 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
         // It tells the graphics card that the data will most likely not change at all or very rarely.
         glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
         glEnableVertexAttribArray(0);
@@ -166,10 +179,15 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     glBindVertexArray(0);
+
+    // NOTE(KS): Unlike with the VBO, we should NOT unbind the EBO within the VAO block.
+    // Not exactly sure why. But we can unbind it here without any issues.
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp *now, const CVTimeStamp *outputTime,
-                                    CVOptionFlags flagsIn, CVOptionFlags *flagsOut, void *displayLinkContext) {
+static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeStamp *now,
+                                    const CVTimeStamp *outputTime, CVOptionFlags flagsIn,
+                                    CVOptionFlags *flagsOut, void *displayLinkContext) {
     @autoreleasepool {
         GameView *openGLView = (__bridge GameView *)displayLinkContext;
         CVReturn result = [openGLView updateAndRenderForTime:outputTime];
@@ -189,10 +207,10 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // Draw our first triangle
+        // Draw the two triangles
         glUseProgram(self.shaderProgram);
         glBindVertexArray(self.vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
 
         [self.openGLContext flushBuffer];
