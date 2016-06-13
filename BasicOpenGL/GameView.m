@@ -71,6 +71,10 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
 
     NSLog(@"OpenGL Version: %s", glGetString(GL_VERSION));
 
+    GLint attributeCount = -1;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &attributeCount);
+    NSLog(@"Max # of vertex attributes supported: %d", attributeCount);
+
     [self initGL];
 }
 
