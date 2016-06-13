@@ -8,18 +8,21 @@
 
 /* Begin PBXBuildFile section */
 		878C06A51CD6BB4400B2AE37 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 878C06A41CD6BB4400B2AE37 /* OpenGL.framework */; };
-		878C06A81CD6BD7600B2AE37 /* GameView.m in Sources */ = {isa = PBXBuildFile; fileRef = 878C06A71CD6BD7600B2AE37 /* GameView.m */; };
+		878C06A81CD6BD7600B2AE37 /* GameView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 878C06A71CD6BD7600B2AE37 /* GameView.mm */; };
 		87E335841CD6B25A0003C441 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 87E335831CD6B25A0003C441 /* AppDelegate.m */; };
 		87E335871CD6B25A0003C441 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 87E335861CD6B25A0003C441 /* main.m */; };
 		87E3358A1CD6B25A0003C441 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 87E335891CD6B25A0003C441 /* ViewController.m */; };
 		87E3358C1CD6B25A0003C441 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 87E3358B1CD6B25A0003C441 /* Assets.xcassets */; };
 		87E3358F1CD6B25A0003C441 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 87E3358D1CD6B25A0003C441 /* Main.storyboard */; };
+		87FEB66D1D0F542C0056EA8A /* Shader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 87FEB66B1D0F542C0056EA8A /* Shader.cpp */; };
+		87FEB6701D0F59D60056EA8A /* Default.vert in Resources */ = {isa = PBXBuildFile; fileRef = 87FEB66F1D0F59D60056EA8A /* Default.vert */; };
+		87FEB6721D0F59F00056EA8A /* Default.frag in Resources */ = {isa = PBXBuildFile; fileRef = 87FEB6711D0F59F00056EA8A /* Default.frag */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		878C06A41CD6BB4400B2AE37 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		878C06A61CD6BD7600B2AE37 /* GameView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameView.h; sourceTree = "<group>"; };
-		878C06A71CD6BD7600B2AE37 /* GameView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameView.m; sourceTree = "<group>"; };
+		878C06A71CD6BD7600B2AE37 /* GameView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GameView.mm; sourceTree = "<group>"; };
 		87E3357F1CD6B25A0003C441 /* BasicOpenGL.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BasicOpenGL.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		87E335821CD6B25A0003C441 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		87E335831CD6B25A0003C441 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -29,6 +32,10 @@
 		87E3358B1CD6B25A0003C441 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		87E3358E1CD6B25A0003C441 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		87E335901CD6B25A0003C441 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		87FEB66B1D0F542C0056EA8A /* Shader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Shader.cpp; sourceTree = "<group>"; };
+		87FEB66C1D0F542C0056EA8A /* Shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Shader.h; sourceTree = "<group>"; };
+		87FEB66F1D0F59D60056EA8A /* Default.vert */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = Default.vert; path = Shaders/Default.vert; sourceTree = "<group>"; };
+		87FEB6711D0F59F00056EA8A /* Default.frag */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = Default.frag; path = Shaders/Default.frag; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +70,7 @@
 		87E335811CD6B25A0003C441 /* BasicOpenGL */ = {
 			isa = PBXGroup;
 			children = (
+				87FEB66E1D0F598C0056EA8A /* Shaders */,
 				87E335821CD6B25A0003C441 /* AppDelegate.h */,
 				87E335831CD6B25A0003C441 /* AppDelegate.m */,
 				87E335881CD6B25A0003C441 /* ViewController.h */,
@@ -72,7 +80,9 @@
 				87E335901CD6B25A0003C441 /* Info.plist */,
 				87E335851CD6B25A0003C441 /* Supporting Files */,
 				878C06A61CD6BD7600B2AE37 /* GameView.h */,
-				878C06A71CD6BD7600B2AE37 /* GameView.m */,
+				878C06A71CD6BD7600B2AE37 /* GameView.mm */,
+				87FEB66B1D0F542C0056EA8A /* Shader.cpp */,
+				87FEB66C1D0F542C0056EA8A /* Shader.h */,
 			);
 			path = BasicOpenGL;
 			sourceTree = "<group>";
@@ -83,6 +93,15 @@
 				87E335861CD6B25A0003C441 /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		87FEB66E1D0F598C0056EA8A /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				87FEB66F1D0F59D60056EA8A /* Default.vert */,
+				87FEB6711D0F59F00056EA8A /* Default.frag */,
+			);
+			name = Shaders;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,7 +162,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				87E3358C1CD6B25A0003C441 /* Assets.xcassets in Resources */,
+				87FEB6701D0F59D60056EA8A /* Default.vert in Resources */,
 				87E3358F1CD6B25A0003C441 /* Main.storyboard in Resources */,
+				87FEB6721D0F59F00056EA8A /* Default.frag in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -156,8 +177,9 @@
 			files = (
 				87E3358A1CD6B25A0003C441 /* ViewController.m in Sources */,
 				87E335871CD6B25A0003C441 /* main.m in Sources */,
-				878C06A81CD6BD7600B2AE37 /* GameView.m in Sources */,
+				878C06A81CD6BD7600B2AE37 /* GameView.mm in Sources */,
 				87E335841CD6B25A0003C441 /* AppDelegate.m in Sources */,
+				87FEB66D1D0F542C0056EA8A /* Shader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

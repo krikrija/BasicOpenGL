@@ -1,5 +1,5 @@
 //
-//  GameView.m
+//  GameView.mm
 //  BasicOpenGL
 //
 //  Created by Krishna Satyanarayana on 2016-05-01.
@@ -7,7 +7,7 @@
 //
 
 #import "GameView.h"
-#import <OpenGL/gl.h>
+#import "Shader.h"
 #import <OpenGL/gl3.h>
 
 NSOpenGLPixelFormatAttribute attrs[] =
@@ -21,30 +21,17 @@ NSOpenGLPixelFormatAttribute attrs[] =
 };
 
 GLfloat vertices[] = {
-     0.5f,  0.5f, 0.0f, // Top Right
-     0.5f, -0.5f, 0.0f, // Bottom Right
-    -0.5f, -0.5f, 0.0f, // Bottom Left
-    -0.5f,  0.5f, 0.0f  // Top Left
+     // Positions        // Colours
+     0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  // Top Right
+     0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  // Bottom Right
+    -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  // Bottom Left
+    -0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 1.0f   // Top Left
 };
 
 GLuint indices[] = {
     0, 1, 3,   // First Triangle
     1, 2, 3    // Second Triangle
 };
-
-// Shaders
-const GLchar* vertexShaderSource = "#version 330 core\n"
-"layout (location = 0) in vec3 position;\n"
-"void main()\n"
-"{\n"
-"gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
-"}\0";
-const GLchar* fragmentShaderSource = "#version 330 core\n"
-"out vec4 color;\n"
-"void main()\n"
-"{\n"
-"color = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-"}\n\0";
 
 
 @interface GameView ()
@@ -54,6 +41,7 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
 @property (assign) GLuint vao;
 @property (assign) GLuint shaderProgram;
 @property (assign) CVDisplayLinkRef displayLink; // Manages the rendering thread
+@property (assign) NSTimeInterval timeSinceStart;
 
 @end
 
@@ -62,6 +50,8 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
 
 - (void)awakeFromNib {
     [super awakeFromNib];
+
+    self.timeSinceStart = 0.0;
 
     NSOpenGLPixelFormat *pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
     NSOpenGLContext *context = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
@@ -100,52 +90,11 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
         CVDisplayLinkStart(_displayLink);
     }
 
-    // Build and compile our shader programs
-    {
-        // Vertex shader
-        GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-        glCompileShader(vertexShader);
-
-        // Check for compile time errors
-        GLint success;
-        GLchar infoLog[512];
-        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-            NSLog(@"ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s", infoLog);
-        }
-
-        // Fragment shader
-        GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-        glCompileShader(fragmentShader);
-
-        // Check for compile time errors
-        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-        if (!success)
-        {
-            glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-            NSLog(@"ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s", infoLog);
-        }
-
-        // Link shaders
-        GLuint shaderProgram = glCreateProgram();
-        self.shaderProgram = shaderProgram;
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        glLinkProgram(shaderProgram);
-
-        // Check for linking errors
-        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-        if (!success) {
-            glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-            NSLog(@"ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s", infoLog);
-        }
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-    }
+    // Compile the vertex and fragment shaders.
+    NSBundle *bundle = [NSBundle mainBundle];
+    const GLchar *vertexShaderPath = [bundle pathForResource:@"Default" ofType:@"vert"].UTF8String;
+    const GLchar *fragmentShaderPath = [bundle pathForResource:@"Default" ofType:@"frag"].UTF8String;
+    self.shaderProgram = basicGL::compileShaders(vertexShaderPath, fragmentShaderPath);
 
     // Generate a vertex array object to store our vertex binding and attribute pointer
     // so we only have to input them once.
@@ -176,8 +125,13 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.ebo);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+        // Position attribute
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)0);
         glEnableVertexAttribArray(0);
+
+        // Colour attribute
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid *)(3 * sizeof(GLfloat)));
+        glEnableVertexAttribArray(1);
 
         // Unbind the buffer object.
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -202,15 +156,15 @@ static CVReturn displayLinkCallback(CVDisplayLinkRef displayLink, const CVTimeSt
     }
 }
 
-- (CVReturn)updateAndRenderForTime:(const CVTimeStamp *)outputTime {
+- (CVReturn)updateAndRenderForTime:(const CVTimeStamp *)time {
     [self.openGLContext makeCurrentContext];
+    double frameRate = time->rateScalar * (double)time->videoTimeScale / (double)time->videoRefreshPeriod;
+    NSTimeInterval deltaTime = 1.0 / frameRate;
+    self.timeSinceStart += deltaTime;
 
     // We must lock GL context because the display link is threaded.
     CGLLockContext((CGLContextObj)self.openGLContext.CGLContextObj);
     {
-        // double frameRate = outputTime->rateScalar * (double)outputTime->videoTimeScale / (double)outputTime->videoRefreshPeriod;
-        // NSTimeInterval deltaTime = 1.0 / frameRate;
-
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
